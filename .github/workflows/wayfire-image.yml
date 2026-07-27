@@ -1,0 +1,53 @@
+name: Build and publish Wayfire image
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'wayfire/v0.11.0/**'
+      - '.github/workflows/wayfire-image.yml'
+  workflow_dispatch:
+
+env:
+  DIR: wayfire/v0.11.0
+  IMAGE: ghcr.io/unity-shell/ci/wayfire:v0.11.0
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: wolfi-dev/actions/install-wolfictl@main
+      - uses: chainguard-dev/actions/melange-keygen@main
+        with:
+          signing-key-path: ${{ github.workspace }}/melange.rsa
+
+      - name: Resolve build order
+        id: order
+        run: |
+          configs=$(wolfictl text --dir "$DIR/melange" --type name \
+            | sed "s#.*#$DIR/melange/&.yaml#" | paste -sd,)
+          echo "configs=$configs" >> "$GITHUB_OUTPUT"
+
+      - uses: chainguard-dev/actions/melange-build@main
+        with:
+          multi-config: ${{ steps.order.outputs.configs }}
+          archs: amd64
+          sign-with-own-key: true
+          signing-key-path: ${{ github.workspace }}/melange.rsa
+          repository-path: ${{ github.workspace }}/packages
+          repository-append: ${{ github.workspace }}/packages
+          keyring-append: ${{ github.workspace }}/melange.rsa.pub
+
+      - uses: chainguard-images/actions/apko-publish@main
+        with:
+          config: ${{ env.DIR }}/apko/wayfire-dev.yaml
+          tag: ${{ env.IMAGE }}
+          archs: amd64
+          repository-append: ${{ github.workspace }}/packages
+          keyring-append: ${{ github.workspace }}/melange.rsa.pub
+          token: ${{ github.token }}
+          vcs-url: true
