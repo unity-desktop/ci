@@ -21,9 +21,12 @@ jobs:
     permissions:
       contents: read
       packages: write
+    defaults:
+      run:
+        shell: bash -euxo pipefail {0}
     steps:
       - uses: actions/checkout@v7
-      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-qemu-action@v4
 
       - name: Generate signing key
         working-directory: ${{ env.DIR }}
@@ -35,24 +38,27 @@ jobs:
         id: order
         working-directory: ${{ env.DIR }}
         run: |
-          configs=$(wolfictl text --dir melange --type name \
-            | sed 's#.*#melange/&.yaml#' | paste -sd,)
-          echo "configs=$configs" >> "$GITHUB_OUTPUT"
-          echo "order: $configs"
+          names=$(wolfictl text --dir melange --type name)
+          test -n "$names"
+          configs=$(echo "$names" | sed 's#.*#melange/&.yaml#')
+          {
+            echo "configs<<EOF"
+            echo "$configs"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Build packages
         working-directory: ${{ env.DIR }}
         run: |
-          set -e
           mkdir -p packages
-          for c in $(echo "${{ steps.order.outputs.configs }}" | tr ',' ' '); do
+          while IFS= read -r c; do
             melange build "$c" \
               --arch amd64 \
               --signing-key keys/melange.rsa \
               --keyring-append keys/melange.rsa.pub \
               --repository-append packages \
               --out-dir packages
-          done
+          done <<< "${{ steps.order.outputs.configs }}"
 
       - name: Publish image
         working-directory: ${{ env.DIR }}

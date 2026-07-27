@@ -58,8 +58,6 @@ pipeline:
 
   - uses: meson/configure
     with:
-      # Lean build sufficient for compiling/linking Wayfire and plugins: no
-      # X11 backend (avoids xcb), GLES2 renderer only (no Vulkan), no examples.
       opts: |
         -Dbuildtype=debugoptimized \
         -Dexamples=false \
