@@ -1,0 +1,64 @@
+package:
+  name: wf-config
+  version: 0.11.0
+  epoch: 0
+  description: Configuration library for Wayfire
+  copyright:
+    - license: MIT
+  dependencies:
+    runtime:
+      - libevdev
+      - libxml2
+
+environment:
+  contents:
+    repositories:
+      - https://packages.wolfi.dev/os
+    keyring:
+      - https://packages.wolfi.dev/os/wolfi-signing.rsa.pub
+    packages:
+      - build-base
+      - busybox
+      - ca-certificates-bundle
+      - doctest
+      - libevdev-dev
+      - libxml2-dev
+      - meson
+      - ninja-build
+      - pkgconf
+      - glm-dev # melange
+
+pipeline:
+  - uses: git-checkout
+    with:
+      repository: https://github.com/WayfireWM/wf-config.git
+      tag: v0.11.0
+      depth: 1
+      recurse-submodules: true
+      shallow-submodules: true
+
+  - uses: meson/configure
+    with:
+      opts: |
+        -Dbuildtype=debugoptimized \
+        -Dtests=disabled
+
+  - uses: meson/compile
+
+  - uses: meson/install
+
+  - uses: strip
+
+subpackages:
+  - name: wf-config-dev
+    pipeline:
+      - uses: split/dev
+    dependencies:
+      runtime:
+        - wf-config # melange
+        - libevdev-dev
+        - libxml2-dev
+        - glm-dev # melange
+
+update:
+  enabled: false

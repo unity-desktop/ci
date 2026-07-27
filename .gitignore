@@ -1,0 +1,7 @@
+# melange signing keys: regenerated with `go-task keys`, never committed
+**/keys/*.rsa
+**/keys/*.rsa.pub
+
+# generated apk repositories and image tarballs
+**/packages/
+**/*.tar

@@ -1,0 +1,48 @@
+package:
+  name: glm
+  version: 1.1.0
+  epoch: 0
+  description: OpenGL Mathematics: header-only C++ math library
+  copyright:
+    - license: MIT
+
+environment:
+  contents:
+    repositories:
+      - https://packages.wolfi.dev/os
+    keyring:
+      - https://packages.wolfi.dev/os/wolfi-signing.rsa.pub
+    packages:
+      - build-base
+      - busybox
+      - ca-certificates-bundle
+      - cmake
+      - ninja-build
+      - pkgconf
+
+pipeline:
+  - uses: git-checkout
+    with:
+      repository: https://github.com/g-truc/glm.git
+      branch: master
+      depth: 1
+
+  - uses: cmake/configure
+    with:
+      opts: |
+        -DBUILD_SHARED_LIBS=OFF \
+        -DGLM_BUILD_INSTALL=ON \
+        -DGLM_BUILD_TESTS=OFF \
+        -DGLM_BUILD_LIBRARY=OFF
+
+  - uses: cmake/build
+
+  - uses: cmake/install
+
+subpackages:
+  - name: glm-dev
+    pipeline:
+      - uses: split/dev
+
+update:
+  enabled: false

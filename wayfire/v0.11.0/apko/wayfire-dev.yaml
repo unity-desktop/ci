@@ -1,0 +1,40 @@
+contents:
+  repositories:
+    - https://packages.wolfi.dev/os
+  keyring:
+    - https://packages.wolfi.dev/os/wolfi-signing.rsa.pub
+  packages:
+    - wolfi-base
+    - busybox
+    - ca-certificates-bundle
+    - build-base
+    - cmake
+    - git
+    - meson
+    - ninja-build
+    - pkgconf
+    - glib-dev
+    - gobject-introspection-dev
+    - wayfire # melange
+    - wayfire-dev # melange
+
+entrypoint:
+  command: /bin/sh -l
+
+environment:
+  PKG_CONFIG_PATH: /usr/lib/pkgconfig:/usr/share/pkgconfig
+
+archs:
+  - amd64
+
+annotations:
+  org.opencontainers.image.title: wayfire-dev
+  org.opencontainers.image.description: Wayfire image for unity-shell
+  org.opencontainers.image.version: 0.11.0
+  org.opencontainers.image.url: https://github.com/unity-shell/ci
+  org.opencontainers.image.source: https://github.com/unity-shell/ci
+  org.opencontainers.image.documentation: https://github.com/unity-shell/ci/blob/main/README.md
+  org.opencontainers.image.vendor: unity-shell
+  org.opencontainers.image.authors: unity-shell
+  org.opencontainers.image.licenses: MIT
+  org.opencontainers.image.ref.name: v0.11.0
