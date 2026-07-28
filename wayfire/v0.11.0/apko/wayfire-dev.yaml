@@ -15,6 +15,8 @@ contents:
     - pkgconf
     - glib-dev
     - gobject-introspection-dev
+    - cairo-dev
+    - libxml2-dev
     - wayfire # melange
     - wayfire-dev # melange
 
