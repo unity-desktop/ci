@@ -10,7 +10,7 @@ on:
 
 env:
   DIR: wayfire/v0.11.0
-  IMAGE: ghcr.io/unity-shell/ci/wayfire:v0.11.0
+  IMAGE: ghcr.io/unity-desktop/ci/wayfire:master
 
 jobs:
   build:

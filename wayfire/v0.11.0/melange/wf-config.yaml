@@ -32,7 +32,7 @@ pipeline:
   - uses: git-checkout
     with:
       repository: https://github.com/WayfireWM/wf-config.git
-      tag: v0.11.0
+      branch: master
       depth: 1
       recurse-submodules: true
       shallow-submodules: true
