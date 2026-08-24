@@ -4,13 +4,13 @@ on:
   push:
     branches: [main]
     paths:
-      - 'wayfire/v0.11.0/**'
+      - 'wayfire/latest/**'
       - '.github/workflows/wayfire-image.yml'
   workflow_dispatch:
 
 env:
-  DIR: wayfire/v0.11.0
-  IMAGE: ghcr.io/unity-desktop/ci/wayfire:master
+  DIR: wayfire/latest
+  IMAGE: ghcr.io/unity-desktop/ci/wayfire:latest
 
 jobs:
   build:

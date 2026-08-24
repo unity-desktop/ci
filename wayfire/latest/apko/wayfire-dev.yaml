@@ -32,11 +32,11 @@ archs:
 annotations:
   org.opencontainers.image.title: wayfire-dev
   org.opencontainers.image.description: Wayfire image for unity-desktop
-  org.opencontainers.image.version: master
+  org.opencontainers.image.version: latest
   org.opencontainers.image.url: https://github.com/unity-desktop/ci
   org.opencontainers.image.source: https://github.com/unity-desktop/ci
   org.opencontainers.image.documentation: https://github.com/unity-desktop/ci/blob/main/README.md
   org.opencontainers.image.vendor: unity-desktop
   org.opencontainers.image.authors: unity-desktop
   org.opencontainers.image.licenses: MIT
-  org.opencontainers.image.ref.name: master
+  org.opencontainers.image.ref.name: latest

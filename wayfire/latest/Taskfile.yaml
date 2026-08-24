@@ -42,7 +42,7 @@ tasks:
           -v "$PWD":/work:Z -w /work \
           --entrypoint apko ghcr.io/wolfi-dev/sdk \
           build apko/wayfire-dev.yaml \
-            ghcr.io/unity-desktop/ci/wayfire:master \
+            ghcr.io/unity-desktop/ci/wayfire:latest \
             wayfire-dev.tar \
             --keyring-append keys/melange.rsa.pub \
             --repository-append packages
@@ -56,7 +56,7 @@ tasks:
           -v "$PWD":/work:Z -w /work \
           --entrypoint apko ghcr.io/wolfi-dev/sdk \
           publish apko/wayfire-dev.yaml \
-            ghcr.io/unity-desktop/ci/wayfire:master \
+            ghcr.io/unity-desktop/ci/wayfire:latest \
             --keyring-append keys/melange.rsa.pub \
             --repository-append packages
 
