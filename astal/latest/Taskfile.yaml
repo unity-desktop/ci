@@ -1,0 +1,65 @@
+version: '3'
+
+tasks:
+  keys:
+    status: [test -f keys/melange.rsa]
+    cmds:
+      - mkdir -p keys
+      - |
+        podman run --rm --privileged \
+          -v "$PWD":/work:Z -w /work \
+          --entrypoint melange ghcr.io/wolfi-dev/sdk \
+          keygen keys/melange.rsa
+
+  packages:
+    deps: [keys]
+    cmds:
+      - |
+        set -e
+        mkdir -p packages
+        # wolfictl derives the dependency order; melange builds each recipe.
+        order=$(podman run --rm \
+          -v "$PWD":/work:Z -w /work \
+          --entrypoint wolfictl ghcr.io/wolfi-dev/sdk \
+          text --dir melange --type name)
+        for p in $order; do
+          podman run --rm --privileged \
+            -v "$PWD":/work:Z -w /work \
+            --entrypoint melange ghcr.io/wolfi-dev/sdk \
+            build "melange/$p.yaml" \
+              --arch amd64 \
+              --signing-key keys/melange.rsa \
+              --keyring-append keys/melange.rsa.pub \
+              --repository-append packages \
+              --out-dir packages
+        done
+
+  image:
+    deps: [packages]
+    cmds:
+      - |
+        podman run --rm --privileged \
+          -v "$PWD":/work:Z -w /work \
+          --entrypoint apko ghcr.io/wolfi-dev/sdk \
+          build apko/astal.yaml \
+            ghcr.io/unity-desktop/ci/astal:latest \
+            astal.tar \
+            --keyring-append keys/melange.rsa.pub \
+            --repository-append packages
+      - 'echo "load with: podman load < astal.tar"'
+
+  push:
+    deps: [packages]
+    cmds:
+      - |
+        podman run --rm --privileged \
+          -v "$PWD":/work:Z -w /work \
+          --entrypoint apko ghcr.io/wolfi-dev/sdk \
+          publish apko/astal.yaml \
+            ghcr.io/unity-desktop/ci/astal:latest \
+            --keyring-append keys/melange.rsa.pub \
+            --repository-append packages
+
+  clean:
+    cmds:
+      - rm -rf packages astal.tar

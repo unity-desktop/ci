@@ -1,0 +1,98 @@
+contents:
+  repositories:
+    - https://packages.wolfi.dev/os
+  keyring:
+    - https://packages.wolfi.dev/os/wolfi-signing.rsa.pub
+  packages:
+    - wolfi-base
+    - bash
+    - coreutils
+    - busybox
+    - ca-certificates-bundle
+    - build-base
+    - git
+    - meson
+    - ninja-build
+    - pkgconf
+    - python-3.13
+    - vala
+    - gettext-dev
+    - glib-dev
+    - glib-gir
+    - gobject-introspection-dev
+    - gdk-pixbuf-dev
+    - gtk-4-dev
+    - linux-pam-dev
+    - pipewire-dev
+    - wayland-dev
+    - wayland-protocols-dev
+    # third-party libraries the Astal libraries link against
+    - appmenu-glib-translator # melange
+    - appmenu-glib-translator-dev # melange
+    - gtk4-layer-shell # melange
+    - gtk4-layer-shell-dev # melange
+    - json-glib # melange
+    - json-glib-dev # melange
+    - libndp # melange
+    - libsoup # melange
+    - libsoup-dev # melange
+    - networkmanager # melange
+    - networkmanager-dev # melange
+    - wireplumber # melange
+    - wireplumber-dev # melange
+    - wl-vapi-gen # melange
+    # Astal libraries
+    - astal-io # melange
+    - astal-io-dev # melange
+    - astal-gtk4 # melange
+    - astal-gtk4-dev # melange
+    - astal-apps # melange
+    - astal-apps-dev # melange
+    - astal-auth # melange
+    - astal-auth-dev # melange
+    - astal-battery # melange
+    - astal-battery-dev # melange
+    - astal-bluetooth # melange
+    - astal-bluetooth-dev # melange
+    - astal-brightness # melange
+    - astal-brightness-dev # melange
+    - astal-greet # melange
+    - astal-greet-dev # melange
+    - astal-mpris # melange
+    - astal-mpris-dev # melange
+    - astal-network # melange
+    - astal-network-dev # melange
+    - astal-notifd # melange
+    - astal-notifd-dev # melange
+    - astal-powerprofiles # melange
+    - astal-powerprofiles-dev # melange
+    - astal-tray # melange
+    - astal-tray-dev # melange
+    - astal-wireplumber # melange
+    - astal-wireplumber-dev # melange
+    - astal-wl # melange
+    - astal-wl-dev # melange
+    - quarrel # melange
+    - quarrel-dev # melange
+
+entrypoint:
+  command: /bin/bash -l
+
+environment:
+  PKG_CONFIG_PATH: /usr/lib/pkgconfig:/usr/share/pkgconfig
+  GI_TYPELIB_PATH: /usr/lib/girepository-1.0
+
+archs:
+  - amd64
+
+annotations:
+  org.opencontainers.image.title: astal
+  org.opencontainers.image.description: Astal libraries image for unity-desktop
+  org.opencontainers.image.version: latest
+  org.opencontainers.image.url: https://github.com/unity-desktop/ci
+  org.opencontainers.image.source: https://github.com/unity-desktop/ci
+  org.opencontainers.image.documentation: https://github.com/unity-desktop/ci/blob/main/README.md
+  org.opencontainers.image.vendor: unity-desktop
+  org.opencontainers.image.authors: unity-desktop
+  org.opencontainers.image.licenses: MIT
+  org.opencontainers.image.ref.name: latest
