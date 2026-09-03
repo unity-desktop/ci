@@ -5,6 +5,8 @@ contents:
     - https://packages.wolfi.dev/os/wolfi-signing.rsa.pub
   packages:
     - wolfi-base
+    - bash
+    - coreutils
     - busybox
     - ca-certificates-bundle
     - build-base
@@ -21,7 +23,7 @@ contents:
     - wayfire-dev # melange
 
 entrypoint:
-  command: /bin/sh -l
+  command: /bin/bash -l
 
 environment:
   PKG_CONFIG_PATH: /usr/lib/pkgconfig:/usr/share/pkgconfig
