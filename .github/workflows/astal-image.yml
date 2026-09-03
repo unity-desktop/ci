@@ -1,0 +1,72 @@
+name: Build and publish Astal image
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'astal/latest/**'
+      - '.github/workflows/astal-image.yml'
+  workflow_dispatch:
+
+env:
+  DIR: astal/latest
+  IMAGE: ghcr.io/unity-desktop/ci/astal:latest
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/wolfi-dev/sdk
+      options: --privileged
+    permissions:
+      contents: read
+      packages: write
+    defaults:
+      run:
+        shell: bash -euxo pipefail {0}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: docker/setup-qemu-action@v4
+
+      - name: Generate signing key
+        working-directory: ${{ env.DIR }}
+        run: |
+          mkdir -p keys
+          melange keygen keys/melange.rsa
+
+      - name: Resolve build order
+        id: order
+        working-directory: ${{ env.DIR }}
+        run: |
+          names=$(wolfictl text --dir melange --type name)
+          test -n "$names"
+          configs=$(echo "$names" | sed 's#.*#melange/&.yaml#')
+          {
+            echo "configs<<EOF"
+            echo "$configs"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Build packages
+        working-directory: ${{ env.DIR }}
+        run: |
+          mkdir -p packages
+          while IFS= read -r c; do
+            melange build "$c" \
+              --arch amd64 \
+              --signing-key keys/melange.rsa \
+              --keyring-append keys/melange.rsa.pub \
+              --repository-append packages \
+              --out-dir packages
+          done <<< "${{ steps.order.outputs.configs }}"
+
+      - name: Publish image
+        working-directory: ${{ env.DIR }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_ACTOR: ${{ github.actor }}
+        run: |
+          apko login ghcr.io -u "$GH_ACTOR" -p "$GH_TOKEN"
+          apko publish apko/astal.yaml "$IMAGE" \
+            --keyring-append keys/melange.rsa.pub \
+            --repository-append packages
