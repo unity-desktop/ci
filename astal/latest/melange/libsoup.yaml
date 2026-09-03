@@ -1,0 +1,82 @@
+package:
+  name: libsoup
+  version: 3.6.6
+  epoch: 0
+  description: HTTP client/server library for GNOME
+  copyright:
+    - license: LGPL-2.0-or-later
+  dependencies:
+    runtime:
+      - brotli
+      - glib
+      - libpsl
+      - nghttp2
+      - sqlite-libs
+
+environment:
+  contents:
+    repositories:
+      - https://packages.wolfi.dev/os
+    keyring:
+      - https://packages.wolfi.dev/os/wolfi-signing.rsa.pub
+    packages:
+      - brotli-dev
+      - build-base
+      - busybox
+      - ca-certificates-bundle
+      - glib-dev
+      - glib-gir
+      - gobject-introspection-dev
+      - libpsl-dev
+      - meson
+      - nghttp2-dev
+      - ninja-build
+      - pkgconf
+      - python-3.13
+      - sqlite-dev
+      - vala
+
+pipeline:
+  - uses: git-checkout
+    with:
+      repository: https://gitlab.gnome.org/GNOME/libsoup.git
+      branch: master
+      depth: 1
+
+  - uses: meson/configure
+    with:
+      opts: |
+        -Dbuildtype=debugoptimized \
+        -Dbrotli=enabled \
+        -Dzstd=disabled \
+        -Dgssapi=disabled \
+        -Dntlm=disabled \
+        -Dsysprof=disabled \
+        -Dintrospection=enabled \
+        -Dvapi=enabled \
+        -Ddocs=disabled \
+        -Ddoc_tests=false \
+        -Dtests=false \
+        -Dinstalled_tests=false \
+        -Dautobahn=disabled \
+        -Dpkcs11_tests=disabled \
+        -Dfuzzing=disabled \
+        -Dtls_check=false
+
+  - uses: meson/compile
+
+  - uses: meson/install
+
+  - uses: strip
+
+subpackages:
+  - name: libsoup-dev
+    pipeline:
+      - uses: split/dev
+    dependencies:
+      runtime:
+        - libsoup # melange
+        - glib-dev
+
+update:
+  enabled: false

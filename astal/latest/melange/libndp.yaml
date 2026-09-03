@@ -1,0 +1,51 @@
+package:
+  name: libndp
+  version: 1.9
+  epoch: 0
+  description: Library for IPv6 Neighbor Discovery Protocol
+  copyright:
+    - license: LGPL-2.1-or-later
+
+environment:
+  contents:
+    repositories:
+      - https://packages.wolfi.dev/os
+    keyring:
+      - https://packages.wolfi.dev/os/wolfi-signing.rsa.pub
+    packages:
+      - autoconf
+      - automake
+      - build-base
+      - busybox
+      - ca-certificates-bundle
+      - libtool
+      - pkgconf
+
+pipeline:
+  - uses: git-checkout
+    with:
+      repository: https://github.com/jpirko/libndp.git
+      branch: master
+      depth: 1
+
+  - uses: autoconf/configure
+    with:
+      opts: |
+        --disable-static
+
+  - uses: autoconf/make
+
+  - uses: autoconf/make-install
+
+  - uses: strip
+
+subpackages:
+  - name: libndp-dev
+    pipeline:
+      - uses: split/dev
+    dependencies:
+      runtime:
+        - libndp # melange
+
+update:
+  enabled: false

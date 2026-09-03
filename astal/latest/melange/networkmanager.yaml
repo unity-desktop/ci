@@ -1,0 +1,120 @@
+package:
+  name: networkmanager
+  version: 1.59.2
+  epoch: 0
+  description: Network configuration and management daemon, and the libnm client library
+  copyright:
+    - license: GPL-2.0-or-later
+  dependencies:
+    runtime:
+      - dbus
+      - glib
+      - gnutls
+      - libsystemd
+      - libudev
+      - libuuid
+      - libndp # melange
+
+environment:
+  contents:
+    repositories:
+      - https://packages.wolfi.dev/os
+    keyring:
+      - https://packages.wolfi.dev/os/wolfi-signing.rsa.pub
+    packages:
+      - bash
+      - build-base
+      - busybox
+      - ca-certificates-bundle
+      - dbus-dev
+      - gettext
+      - gettext-dev
+      - glib-dev
+      - glib-gir
+      - gnutls-dev
+      - gobject-introspection-dev
+      - linux-headers
+      - meson
+      - ninja-build
+      - perl
+      - pkgconf
+      - python-3.13
+      - systemd-dev
+      - util-linux-dev
+      - vala
+      - libndp-dev # melange
+
+pipeline:
+  - uses: git-checkout
+    with:
+      repository: https://gitlab.freedesktop.org/NetworkManager/NetworkManager.git
+      branch: main
+      depth: 1
+
+  # astal-network only consumes libnm, its typelib and its vapi, so keep the
+  # daemon lean and drop every optional plugin and client tool.
+  - uses: meson/configure
+    with:
+      opts: |
+        --sysconfdir=/etc \
+        --sbindir=/usr/bin \
+        --localstatedir=/var \
+        --sharedstatedir=/var/lib \
+        -Dbuildtype=debugoptimized \
+        -Dcrypto=gnutls \
+        -Dsession_tracking=systemd \
+        -Dsession_tracking_consolekit=false \
+        -Dsuspend_resume=systemd \
+        -Dsystemd_journal=false \
+        -Dselinux=false \
+        -Dlibaudit=no \
+        -Dpolkit=false \
+        -Dmodem_manager=false \
+        -Dofono=false \
+        -Dovs=false \
+        -Dppp=false \
+        -Dteamdctl=false \
+        -Dwext=false \
+        -Diwd=false \
+        -Dbluez5_dun=false \
+        -Dnmcli=false \
+        -Dnmtui=false \
+        -Dnm_cloud_setup=false \
+        -Dconcheck=false \
+        -Dinitrd=false \
+        -Dnbft=false \
+        -Dclat=false \
+        -Difcfg_rh=false \
+        -Difupdown=false \
+        -Ddhcpcd=no \
+        -Dconfig_dhcp_default=internal \
+        -Dfirewalld_zone=false \
+        -Dlibpsl=false \
+        -Dld_gc=false \
+        -Dintrospection=true \
+        -Dvapi=true \
+        -Ddocs=false \
+        -Dman=false \
+        -Dtests=no \
+        -Dqt=false \
+        -Dreadline=none \
+        -Dmore_asserts=0 \
+        -Dmore_logging=false
+
+  - uses: meson/compile
+
+  - uses: meson/install
+
+  - uses: strip
+
+subpackages:
+  - name: networkmanager-dev
+    pipeline:
+      - uses: split/dev
+    dependencies:
+      runtime:
+        - networkmanager # melange
+        - glib-dev
+
+update:
+  enabled: false

@@ -1,0 +1,65 @@
+package:
+  name: json-glib
+  version: 1.10.8
+  epoch: 0
+  description: JSON parser and generator library for GLib
+  copyright:
+    - license: LGPL-2.1-or-later
+  dependencies:
+    runtime:
+      - glib
+
+environment:
+  contents:
+    repositories:
+      - https://packages.wolfi.dev/os
+    keyring:
+      - https://packages.wolfi.dev/os/wolfi-signing.rsa.pub
+    packages:
+      - build-base
+      - busybox
+      - ca-certificates-bundle
+      - glib-dev
+      - glib-gir
+      - gobject-introspection-dev
+      - meson
+      - ninja-build
+      - pkgconf
+      - vala
+
+pipeline:
+  - uses: git-checkout
+    with:
+      repository: https://gitlab.gnome.org/GNOME/json-glib.git
+      branch: main
+      depth: 1
+
+  - uses: meson/configure
+    with:
+      opts: |
+        -Dbuildtype=debugoptimized \
+        -Dintrospection=enabled \
+        -Ddocumentation=disabled \
+        -Dman=false \
+        -Dnls=disabled \
+        -Dtests=false \
+        -Dconformance=false \
+        -Dinstalled_tests=false
+
+  - uses: meson/compile
+
+  - uses: meson/install
+
+  - uses: strip
+
+subpackages:
+  - name: json-glib-dev
+    pipeline:
+      - uses: split/dev
+    dependencies:
+      runtime:
+        - json-glib # melange
+        - glib-dev
+
+update:
+  enabled: false

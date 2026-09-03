@@ -1,0 +1,46 @@
+package:
+  name: wl-vapi-gen
+  version: 1.1.0
+  epoch: 0
+  description: Vala binding generator for Wayland protocol XML files
+  copyright:
+    - license: LGPL-2.1-or-later
+  dependencies:
+    runtime:
+      - python-3.13
+
+environment:
+  contents:
+    repositories:
+      - https://packages.wolfi.dev/os
+    keyring:
+      - https://packages.wolfi.dev/os/wolfi-signing.rsa.pub
+    packages:
+      - build-base
+      - busybox
+      - ca-certificates-bundle
+      - meson
+      - ninja-build
+      - pkgconf
+      - python-3.13
+
+pipeline:
+  - uses: git-checkout
+    with:
+      repository: https://github.com/kotontrion/wl-vapi-gen.git
+      branch: main
+      depth: 1
+
+  - uses: meson/configure
+
+  - uses: meson/compile
+
+  - uses: meson/install
+
+  # meson installs the generator through configure_file, which does not carry
+  # the executable bit, but astal-wl locates it with find_program.
+  - runs: |
+      chmod 0755 "${{targets.contextdir}}/usr/bin/wl-vapi-gen"
+
+update:
+  enabled: false

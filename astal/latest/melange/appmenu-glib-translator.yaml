@@ -1,0 +1,65 @@
+package:
+  name: appmenu-glib-translator
+  version: 24.02
+  epoch: 0
+  description: Translator from the DBusMenu protocol to GMenuModel
+  copyright:
+    - license: LGPL-3.0-or-later
+  dependencies:
+    runtime:
+      - gdk-pixbuf
+      - glib
+
+environment:
+  contents:
+    repositories:
+      - https://packages.wolfi.dev/os
+    keyring:
+      - https://packages.wolfi.dev/os/wolfi-signing.rsa.pub
+    packages:
+      - build-base
+      - busybox
+      - ca-certificates-bundle
+      - gdk-pixbuf-dev
+      - glib-dev
+      - glib-gir
+      - gobject-introspection-dev
+      - meson
+      - ninja-build
+      - pkgconf
+      - vala
+
+pipeline:
+  # Upstream ships the translator as a standalone meson project inside the
+  # vala-panel-appmenu tree, so build only that subdirectory.
+  - uses: git-checkout
+    with:
+      repository: https://gitlab.com/vala-panel-project/vala-panel-appmenu.git
+      branch: master
+      depth: 1
+
+  - working-directory: subprojects/appmenu-glib-translator
+    pipeline:
+      - uses: meson/configure
+        with:
+          opts: |
+            -Dbuildtype=debugoptimized
+
+      - uses: meson/compile
+
+      - uses: meson/install
+
+  - uses: strip
+
+subpackages:
+  - name: appmenu-glib-translator-dev
+    pipeline:
+      - uses: split/dev
+    dependencies:
+      runtime:
+        - appmenu-glib-translator # melange
+        - gdk-pixbuf-dev
+        - glib-dev
+
+update:
+  enabled: false
